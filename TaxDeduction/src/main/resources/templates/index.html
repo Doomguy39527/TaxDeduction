@@ -7,39 +7,43 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #e6f2ff; /* สีน้ำเงินอ่อน */
+            background-color: #e6f2ff;
             margin: 0;
             padding: 20px;
             min-height: 100vh;
         }
 
         .container {
-            background-color: #ffffff; /* สีขาว */
+            background-color: #ffffff;
             padding: 40px 50px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             max-width: 600px;
             width: 100%;
             margin: 20px auto;
-            border: 2px solid #003366; /* เส้นขอบน้ำเงิน */
+            border: 2px solid #003366;
         }
 
         .container h1 {
             text-align: center;
-            color: #003366; /* สีน้ำเงิน */
+            color: #003366;
             margin-bottom: 10px;
         }
 
         .container p {
             text-align: center;
-            color: #212529; /* สีดำ */
+            color: #212529;
             margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
         }
 
         .form-group label {
             display: block;
             margin-bottom: 5px;
-            color: #003366; /* สีน้ำเงิน */
+            color: #003366;
             font-weight: bold;
         }
 
@@ -53,13 +57,13 @@
         }
 
         .form-group input:focus {
-            border-color: #003366; /* สีน้ำเงิน */
+            border-color: #003366;
             outline: none;
             box-shadow: 0 0 8px rgba(0, 51, 102, 0.3);
         }
 
         .error-message {
-            color: #dc3545; /* สีแดง */
+            color: #dc3545;
             font-size: 14px;
             margin-top: 5px;
         }
@@ -67,10 +71,10 @@
         .btn {
             width: 100%;
             padding: 15px;
-            background-color: #003366; /* สีน้ำเงิน */
+            background-color: #003366;
             border: none;
             border-radius: 8px;
-            color: #ffffff; /* สีขาว */
+            color: #ffffff;
             font-size: 20px;
             font-weight: bold;
             cursor: pointer;
@@ -78,57 +82,108 @@
         }
 
         .btn:hover {
-            background-color: #00509e; /* สีน้ำเงินเข้ม */
+            background-color: #00509e;
         }
 
-        .result-section {
-            margin-top: 30px;
-            padding: 20px;
-            background-color: #e6f2ff; /* สีน้ำเงินอ่อน */
-            border-radius: 8px;
+        .name-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .name-group .form-group {
+            flex: 1;
+        }
+
+        /* Popup Styles */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .popup-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            z-index: 1001;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .close-popup {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #003366;
+            background: none;
+            border: none;
+            padding: 5px;
+            transition: color 0.3s ease;
+        }
+
+        .close-popup:hover {
+            color: #00509e;
         }
 
         .result-item {
             margin-bottom: 15px;
-            padding: 10px;
-            background-color: #ffffff; /* สีขาว */
-            border-radius: 6px;
-            border: 1px solid #003366; /* เส้นขอบน้ำเงิน */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
         }
 
         .result-item h3 {
             margin: 0;
-            color: #003366; /* สีน้ำเงิน */
+            color: #003366;
             font-size: 16px;
         }
 
         .result-item p {
             margin: 5px 0 0;
             font-size: 20px;
-            color: #212529; /* สีดำ */
+            color: #212529;
             font-weight: bold;
         }
 
-        /* เพิ่มสไตล์สำหรับการจัดวางชื่อและนามสกุล */
-        .name-group {
-            display: flex; /* จัดวางให้เป็นแถว */
-            gap: 10px; /* เพิ่มช่องว่างระหว่างฟิลด์ */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        .name-group .form-group {
-            flex: 1; /* ให้ฟิลด์ทั้งสองมีความกว้างเท่ากัน */
+        @keyframes slideIn {
+            from {
+                transform: translate(-50%, -60%);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, -50%);
+                opacity: 1;
+            }
         }
     </style>
 </head>
 <body>
-
 <div class="container">
     <h1>เครื่องคำนวณค่าลดหย่อนภาษี</h1>
     <p>ประจำปีภาษี 2566</p>
 
     <form th:action="@{/calculate}" th:object="${taxDeductionRequest}" method="post">
-        <div class="form-group name-group">
+        <div class="name-group">
             <div class="form-group">
                 <label for="firstName">ชื่อ</label>
                 <input type="text" id="firstName" th:field="*{firstName}" placeholder="กรอกชื่อ">
@@ -179,9 +234,13 @@
 
         <button type="submit" class="btn">คำนวณภาษี</button>
     </form>
+</div>
 
-    <!-- ส่วนแสดงผลลัพธ์ -->
-    <div class="result-section" th:if="${totalDeductions != null}" style="display: block;">
+<!-- Popup for results -->
+<div class="popup-overlay" th:if="${totalDeductions != null}">
+    <div class="popup-content">
+        <button class="close-popup" onclick="closePopup()">&times;</button>
+        <h2 style="text-align: center; color: #003366; margin-bottom: 20px;">ผลการคำนวณภาษี</h2>
         <div class="result-item">
             <h3>ชื่อ-นามสกุล</h3>
             <p><span th:text="${firstName}"></span> <span th:text="${lastName}"></span></p>
@@ -201,5 +260,28 @@
     </div>
 </div>
 
+<script>
+    // Show popup when page loads if results exist
+    window.onload = function() {
+        var popup = document.querySelector('.popup-overlay');
+        if (popup) {
+            popup.style.display = 'block';
+        }
+    }
+
+    // Close popup function
+    function closePopup() {
+        document.querySelector('.popup-overlay').style.display = 'none';
+    }
+
+    // Close popup when clicking outside
+    document.addEventListener('click', function(event) {
+        var popup = document.querySelector('.popup-overlay');
+        var popupContent = document.querySelector('.popup-content');
+        if (popup && event.target === popup) {
+            popup.style.display = 'none';
+        }
+    });
+</script>
 </body>
 </html>
