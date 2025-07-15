@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>คำนวณภาษีเงินได้บุคคลธรรมดา</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gradient-start: #1a237e;
+            --gradient-end: #3949ab;
+            --accent-blue: #3d5afe;
+            --light-blue: #e8eaf6;
+            --dark-blue: #0d47a1;
+            --text-dark: #1a1a1a;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7ff 0%, #ffffff 100%);
+            color: var(--text-dark);
+            font-family: 'Prompt', sans-serif;
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        .container {
+            max-width: 1000px;
+        }
+
+        h2 {
+            color: var(--dark-blue);
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            background: linear-gradient(120deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            padding: 1rem 0;
+        }
+
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            background: linear-gradient(120deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            border-bottom: none;
+            padding: 1.5rem;
+        }
+
+        .card-header h5 {
+            color: white;
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 500;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.8rem;
+        }
+
+        .form-control {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 0.8rem 1rem;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 0.25rem rgba(61, 90, 254, 0.25);
+        }
+
+        label {
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .required::after {
+            content: " *";
+            color: #ff5252;
+        }
+
+        .btn-primary {
+            background: linear-gradient(120deg, var(--gradient-start), var(--gradient-end));
+            border: none;
+            padding: 1rem 3rem;
+            font-size: 1.2rem;
+            font-weight: 500;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(26,35,126,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26,35,126,0.4);
+            background: linear-gradient(120deg, var(--gradient-end), var(--gradient-start));
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger {
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+        }
+
+        .form-check-input {
+            width: 1.2rem;
+            height: 1.2rem;
+            margin-top: 0.3rem;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+
+        .form-check-label {
+            padding-left: 0.5rem;
+        }
+
+        .tax-result {
+            background: linear-gradient(135deg, #ffffff 0%, var(--light-blue) 100%);
+            padding: 2.5rem;
+            border-radius: 16px;
+            margin-top: 3rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .tax-result h4 {
+            color: var(--dark-blue);
+            margin-bottom: 2rem;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .tax-result p {
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+        }
+
+        .tax-result span {
+            font-weight: 600;
+            color: var(--dark-blue);
+            font-size: 1.3rem;
+        }
+
+        .text-danger {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .donation-input-group {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+
+            .card-body {
+                padding: 1.5rem;
+            }
+
+            .tax-result {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>คำนวณภาษีเงินได้บุคคลธรรมดา</h2>
+
+    <form th:action="@{/calculate}" method="post" th:object="${taxDeductionModel}">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">ข้อมูลรายได้</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="required">รายได้จากการจ้างงาน (บาท)</label>
+                    <input type="number" class="form-control" th:field="*{employmentIncome}" required step="0.01">
+                    <div class="text-danger" th:if="${#fields.hasErrors('employmentIncome')}" th:errors="*{employmentIncome}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="required">รายได้จากธุรกิจ/อาชีพอิสระ (บาท)</label>
+                    <input type="number" class="form-control" th:field="*{businessIncome}" required step="0.01">
+                    <div class="text-danger" th:if="${#fields.hasErrors('businessIncome')}" th:errors="*{businessIncome}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="required">รายได้จากการลงทุน (บาท)</label>
+                    <input type="number" class="form-control" th:field="*{investmentIncome}" required step="0.01">
+                    <div class="text-danger" th:if="${#fields.hasErrors('investmentIncome')}" th:errors="*{investmentIncome}"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">ข้อมูลลดหย่อน</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-check mb-4">
+                    <input type="checkbox" class="form-check-input" th:field="*{hasSpouse}">
+                    <label class="form-check-label">มีคู่สมรส</label>
+                </div>
+
+                <div class="form-group">
+                    <label>จำนวนบิดา-มารดาที่อายุเกิน 60 ปี</label>
+                    <select class="form-control form-select" th:field="*{parentSupportCount}">
+                        <option value="0">0 คน</option>
+                        <option value="1">1 คน</option>
+                        <option value="2">2 คน</option>
+                    </select>
+                    <div class="text-danger" th:if="${#fields.hasErrors('parentSupportCount')}" th:errors="*{parentSupportCount}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>จำนวนบุตรที่อายุไม่เกิน 20 ปี </label>
+                    <input type="number" class="form-control" th:field="*{childDeduction}" step="0.01">
+                </div>
+
+                <div class="form-group">
+                    <label>เบี้ยประกันชีวิต (บาท)</label>
+                    <input type="number" class="form-control" th:field="*{lifeInsuranceDeduction}" step="0.01">
+                </div>
+
+                <div class="form-group">
+                    <label>กองทุนสำรองเลี้ยงชีพ (บาท)</label>
+                    <input type="number" class="form-control" th:field="*{providentFundDeduction}" step="0.01">
+                </div>
+
+                <div class="form-group">
+                    <label>ประกันสังคม (บาท)</label>
+                    <input type="number" class="form-control" th:field="*{socialSecurityDeduction}" step="0.01">
+                </div>
+
+                <div class="form-group">
+                    <label>เงินบริจาค</label>
+                    <div id="donationsContainer">
+                        <div class="donation-input-group mb-2 d-flex align-items-center">
+                            <input type="number" class="form-control donation-input" name="donations[]" step="0.01" placeholder="จำนวนเงินบริจาค">
+                            <button type="button" class="btn btn-danger ms-2 remove-donation" style="display: none;">ลบ</button>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <button type="button" class="btn btn-secondary" id="addDonation">เพิ่มช่องบริจาค</button>
+                    </div>
+                    <div class="mt-2">
+                        <strong>ยอดบริจาครวม: <span id="totalDonation">0</span> บาท</strong>
+                    </div>
+                    <input type="hidden" id="totalDonationInput" th:field="*{donationDeduction}">
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">คำนวณภาษี</button>
+        </div>
+    </form>
+
+    <div th:if="${result != null}" class="tax-result">
+        <h4 class="text-center">ผลการคำนวณภาษี</h4>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <p>รายได้รวม: <span th:text="${#numbers.formatDecimal(result.calculateTotalIncome(), 0, 'COMMA', 2, 'POINT')}">0</span> บาท</p>
+                <p>ค่าลดหย่อนทั้งหมด: <span th:text="${#numbers.formatDecimal(result.calculateTotalDeductions(), 0, 'COMMA', 2, 'POINT')}">0</span> บาท</p>
+                <p>เงินได้สุทธิ: <span th:text="${#numbers.formatDecimal(result.calculateTaxableIncome(), 0, 'COMMA', 2, 'POINT')}">0</span> บาท</p>
+                <p>ภาษีที่ต้องชำระ: <span th:text="${#numbers.formatDecimal(result.calculateIncomeTax(), 0, 'COMMA', 2, 'POINT')}">0</span> บาท</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const donationsContainer = document.getElementById('donationsContainer');
+        const addButton = document.getElementById('addDonation');
+        const totalSpan = document.getElementById('totalDonation');
+        const totalDonationInput = document.getElementById('totalDonationInput');
+
+        // Add new donation field
+        addButton.addEventListener('click', function() {
+            const newGroup = document.createElement('div');
+            newGroup.className = 'donation-input-group mb-2 d-flex align-items-center';
+            newGroup.innerHTML = `
+                <input type="number" class="form-control donation-input" name="donations" step="0.01" placeholder="จำนวนเงินบริจาค">
+                <button type="button" class="btn btn-danger ms-2 remove-donation">ลบ</button>
+            `;
+            donationsContainer.appendChild(newGroup);
+            updateRemoveButtons();
+            updateTotal();
+        });
+
+        // Remove donation field
+        donationsContainer.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-donation')) {
+                e.target.closest('.donation-input-group').remove();
+                updateRemoveButtons();
+                updateTotal();
+            }
+        });
+
+        // Update when inputs change
+        donationsContainer.addEventListener('input', function(e) {
+            if (e.target.classList.contains('donation-input')) {
+                updateTotal();
+            }
+        });
+
+        // Update visibility of remove buttons
+        function updateRemoveButtons() {
+            const groups = donationsContainer.getElementsByClassName('donation-input-group');
+            Array.from(groups).forEach((group, index) => {
+                const removeButton = group.querySelector('.remove-donation');
+                if (groups.length === 1) {
+                    removeButton.style.display = 'none';
+                } else {
+                    removeButton.style.display = 'block';
+                }
+            });
+        }
+
+        // Calculate and update total
+        function updateTotal() {
+            const inputs = donationsContainer.getElementsByClassName('donation-input');
+            let total = 0;
+            Array.from(inputs).forEach(input => {
+                const value = parseFloat(input.value) || 0;
+                total += value;
+            });
+            totalSpan.textContent = total.toFixed(2);
+            totalDonationInput.value = total; // อัพเดทค่าใน hidden input สำหรับส่งฟอร์ม
+        }
+
+        // Initialize
+        updateRemoveButtons();
+    });
+</script>
+</body>
+</html>
